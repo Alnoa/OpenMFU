@@ -1,16 +1,21 @@
-"authors":
-[
-    {
-        "name": "Alnoa",
-        "email": "info@alnoa.fr",
-        "url": "http://www.alnoa.fr"
-        "maintainer": true
-    }
-]
-"repository":
 {
+  "name": "Opne MFU",
+  "keywords": "RC, MFU, TAMIYA, TRUCK",
+  "description": "A library that makes controlling a RC vehicule via serial",
+  "homepage": "https://github.com/Alnoa/OpenMFU/",
+  "authors":
+      {
+          "name": "Alnoa",
+          "email": "info@alnoa.fr",
+          "url": "http://www.alnoa.fr"
+      },
+  "repository":
+  {
     "type": "git",
     "url": "https://github.com/Alnoa/OpenMFU/"
-},
-"version": "0.1.0"
-"license": "Beerware"
+  },
+  "version": "0.0.1",
+  "frameworks": "arduino",
+  "platforms": "*",
+  "license": "Beerware"
+}
