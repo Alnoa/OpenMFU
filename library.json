@@ -1,5 +1,5 @@
 {
-  "name": "Opne MFU",
+  "name": "OpenMFU",
   "keywords": "RC, MFU, TAMIYA, TRUCK",
   "description": "A library that makes controlling a RC vehicule via serial",
   "homepage": "https://github.com/Alnoa/OpenMFU/",
