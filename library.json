@@ -1,0 +1,16 @@
+"authors":
+[
+    {
+        "name": "Alnoa",
+        "email": "info@alnoa.fr",
+        "url": "http://www.alnoa.fr"
+        "maintainer": true
+    }
+]
+"repository":
+{
+    "type": "git",
+    "url": "https://github.com/foo/bar.git"
+},
+"version": "0.1.0"
+"license": "Beerware"

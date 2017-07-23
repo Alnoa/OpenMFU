@@ -1,0 +1,31 @@
+#######################################
+# Syntax Coloring Map For TruckBee
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+remorque_etat
+niveau_batterie
+traction
+volant
+veilleuses
+gyrophares
+phares
+feux_de_croisements
+clignotant_droit
+bclignotant_gauche
+longues_vues_hautes
+antibrouillards
+sirene
+moteur
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+TruckBee KEYWORD1
+
+#######################################
+# Constants (LITERAL1)
+#######################################
