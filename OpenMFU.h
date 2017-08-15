@@ -4,6 +4,7 @@
 
 #include <inttypes.h>
 #include <arduino.h>
+
 typedef enum{
 	ModeJour = 0b00000111,
 	ModeVeilleuse= 0b00000001,
@@ -11,17 +12,23 @@ typedef enum{
 	ModePleinPhare = 0b00000111
 } ModePhare;
 
-class TruckBee{
+typedef enum{
+	Gauche =   0b00010000,
+	Droit =  	 0b00001000,
+	Warnings = 0b00011000
+} ModeClignotants;
+
+class OpenMFU{
 public:
 	//constructeur
-	TruckBee(int speed_xbee,bool mode);
+	OpenMFU(bool mode);
 	//modificateurs
-	void Etablir_liason(bool mode);
+	void init();
 	void Dernier_contact_RF();
 	void etat_FAILSAFE();
 	void Envoie();
 	void Recoie();
-	void setveil_crois_phares(int A);
+	void setveil_crois_phares(ModePhare);
 	void longues_vues(bool A);
 	void setKlaxon(bool B);
 	void setContact_moteur(bool M);
@@ -65,6 +72,7 @@ private:
 	* Périphériques
 	*/
 	bool remorque_etat;
+	uint8_t type_remorque;
 	uint8_t niveau_batterie;
 	/**
 	* Eclairage
