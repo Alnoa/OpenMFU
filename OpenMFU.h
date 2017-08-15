@@ -28,7 +28,7 @@ public:
 	void etat_FAILSAFE();
 	void Envoie();
 	void Recoie();
-	void setveil_crois_phares(ModePhare);
+	void setveil_crois_phares(char MP);
 	void longues_vues(bool A);
 	void setKlaxon(bool B);
 	void setContact_moteur(bool M);
@@ -102,11 +102,5 @@ private:
 	*/
 	byte commandes[10];
 	void HEX_to_BIN(byte monByte,uint8_t casier_RAM);
-	typedef enum{
-		ModeJour = 0b00000111,
-		ModeVeilleuse= 0b00000001,
-		ModeFeuxCroisement = 0b00000011,
-		ModePleinPhare = 0b00000111
-	} ModePhare;
 };
 #endif

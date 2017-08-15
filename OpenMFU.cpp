@@ -13,7 +13,6 @@
   Serial2.begin(57600);
 #endif
 
-
 #define DEBUG
 
 /**
@@ -150,7 +149,7 @@ void OpenMFU::setveil_crois_phares(ModePhare){//enum !!!! http://www.locoduino.o
   /* typedef enum { ModeJour = 000b, ModeVeilleuse= 001b, ModeFeuxCroisement = 011b, ModePleinPhare = 111b} ModePhare;
    donc tu peux utiliser les masques, justement pour éviter le switch
    je te conseilles très fortement de faire un #define pour chaque masque*/
-  switch (ModePhare) {
+  switch(ModePhare){
     case ModeVeilleuse:// mode veilleuses
     memtab[1]= memtab[1] | ModeVeilleuse;
     veilleuses=true;
