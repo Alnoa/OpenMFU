@@ -80,7 +80,6 @@ void OpenMFU::HEX_to_BIN(byte monByte,uint8_t casier_RAM){
     }
   }
 }
-
 void OpenMFU::Envoie(){
   Serial2.write(0x3F);
   Serial2.write((uint8_t*)memtab,sizeof(memtab));
@@ -100,8 +99,6 @@ void OpenMFU::init(){
 
   Serial.print("lib OpenMFU ,etablissement de la liason ...");
   #endif // DEBUG
-
-  Serial2.begin(Serial2_speed_xbee);
   Serial2.print("+++");
   Serial.print("+++");
   char Byte_de_test = 0;
@@ -128,15 +125,16 @@ void OpenMFU::init(){
   Serial.println("Xbee connecté !");
   #endif // DEBUG
 }
-void OpenMFU::Dernier_contact_RF(){// !serialavilable >10 fois ex ou verif etat de la broche Rssi ou led asso du xbee
+void OpenMFU::Dernier_contact_RF(){
+  // !serialavilable >10 fois ex ou verif etat de la broche Rssi ou led asso du xbee
   if(millis()-Dernier_contact_radio>FAILSAFE || compteur_failsafe>10){
     etat_FAILSAFE();
   }
 }
 void OpenMFU::etat_FAILSAFE(){}
 void OpenMFU::Recoie(){
-  if (Serial2.available() >= 6 ) { // wait for 6 characters
-    for (int i=0; i < 6; i++){
+  if (Serial2.available() >= 8 ) { // wait for 6 characters
+    for (int i=0; i < 8; i++){
       commandes[i] = Serial2.read();
       Serial.print(commandes[i],HEX);
       Serial.print(" ");
@@ -145,11 +143,11 @@ void OpenMFU::Recoie(){
     Serial.println(" ");
   }
 }
-void OpenMFU::setveil_crois_phares(ModePhare){//enum !!!! http://www.locoduino.org/spip.php?article102
+void OpenMFU::setveil_crois_phares(ModePhare MM){//enum !!!! http://www.locoduino.org/spip.php?article102
   /* typedef enum { ModeJour = 000b, ModeVeilleuse= 001b, ModeFeuxCroisement = 011b, ModePleinPhare = 111b} ModePhare;
    donc tu peux utiliser les masques, justement pour éviter le switch
    je te conseilles très fortement de faire un #define pour chaque masque*/
-  switch(ModePhare){
+  switch(MM){
     case ModeVeilleuse:// mode veilleuses
     memtab[1]= memtab[1] | ModeVeilleuse;
     veilleuses=true;
@@ -172,32 +170,24 @@ void OpenMFU::setveil_crois_phares(ModePhare){//enum !!!! http://www.locoduino.o
     break;
   }
 }
-void OpenMFU::setClignotants(ModeClignotants){
-  switch(ModeClignotants){
+void OpenMFU::setClignotants(ModeClignotants MC){
+  switch(MC){
     case Gauche:
-    memtab[1] = memtab[1] | Gauche;
-    /*
-    bitWrite(memtab[1],adrmemtab_clignotant_gauche,true);
-    bitWrite(memtab[1],adrmemtab_clignotant_droit,false);
-    */
+    memtab[1] = memtab[1] | Gauche; //application du masque
+                                    /* Ancienement
+                                      bitWrite(memtab[1],adrmemtab_clignotant_gauche,true);
+                                      bitWrite(memtab[1],adrmemtab_clignotant_droit,false);
+                                    */
     clignotant_droit=false;
     clignotant_gauche=true;
     break;
     case Droit:
     memtab[1] = memtab[1] | Droit;
-    /*
-    bitWrite(memtab[1],adrmemtab_clignotant_gauche,false);
-    bitWrite(memtab[1],adrmemtab_clignotant_droit,true);
-    */
     clignotant_droit=true;
     clignotant_gauche=false;
     break;
     case Warnings:
     memtab[1] = memtab[1] | Warnings;
-    /*
-    bitWrite(memtab[1],adrmemtab_clignotant_gauche,true);
-    bitWrite(memtab[1],adrmemtab_clignotant_droit,true);
-    */
     clignotant_droit=true;
     clignotant_gauche=true;
     break;
@@ -205,9 +195,9 @@ void OpenMFU::setClignotants(ModeClignotants){
     break;
   }
 }
-void OpenMFU::longues_vues(bool A){
-  longues_vues_hautes=A;
-  if(A){
+void OpenMFU::longues_vues(bool LV){
+  longues_vues_hautes=LV;
+  if(LV){
     bitWrite(memtab[1],adrmemtab_longues_vues_hautes,true);
     longues_vues_hautes=true;
   }else{
@@ -215,25 +205,25 @@ void OpenMFU::longues_vues(bool A){
     longues_vues_hautes=false;
   }
 }
-void OpenMFU::setKlaxon(bool B){
-  klaxon_sirene=B;
-  switch (B) {
-    case 1:
+void OpenMFU::setKlaxon(bool K){
+  klaxon_sirene=K;
+  switch (K) {
+    case true:
     bitWrite(memtab[1],adrmemtab_klaxon,true);
     break;
-    case 0:
+    case false:
     bitWrite(memtab[1],adrmemtab_klaxon,false);
     break;
-    default:
-    break;
+    //default:
+    //break;
   }
 }
 void OpenMFU::setDirection(int vol){
   volant=constrain(vol,-100,100);
   memtab[3]=map(vol,-100,100,0,0xC8);
 }
-void OpenMFU::setContact_moteur(bool M){
-  moteur = M;
+void OpenMFU::setContact_moteur(bool CM){
+  moteur = CM;
   if(moteur){
     bitWrite(memtab[2],4,1);
   }else{

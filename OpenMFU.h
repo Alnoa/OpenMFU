@@ -4,9 +4,9 @@
 
 #include <inttypes.h>
 #include <arduino.h>
-
+#include <HardwareSerial.h>
 typedef enum{
-	ModeJour = 0b00000111,
+	ModeJour = 0b00000000,
 	ModeVeilleuse= 0b00000001,
 	ModeFeuxCroisement = 0b00000011,
 	ModePleinPhare = 0b00000111
@@ -28,13 +28,13 @@ public:
 	void etat_FAILSAFE();
 	void Envoie();
 	void Recoie();
-	void setveil_crois_phares(char MP);
-	void longues_vues(bool A);
-	void setKlaxon(bool B);
-	void setContact_moteur(bool M);
+	void setveil_crois_phares(ModePhare MP);
+	void longues_vues(bool LV);
+	void setKlaxon(bool K);
+	void setContact_moteur(bool CM);
 	void setTraction(int acc);
 	void setDirection(int vol);
-	void setClignotants(char B);
+	void setClignotants(ModeClignotants MC);
 
 	//accesseurs
 	//Péripheriques
