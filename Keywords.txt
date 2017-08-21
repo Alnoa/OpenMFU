@@ -1,5 +1,5 @@
 #######################################
-# Syntax Coloring Map For TruckBee
+# Syntax Coloring Map For OpenMFU
 #######################################
 
 #######################################
@@ -24,7 +24,7 @@ moteur
 # Methods and Functions (KEYWORD2)
 #######################################
 
-TruckBee KEYWORD1
+OpenMFU KEYWORD1
 
 #######################################
 # Constants (LITERAL1)
