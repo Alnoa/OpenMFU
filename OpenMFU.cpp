@@ -1,9 +1,4 @@
 #include "OpenMFU.h"
-#if (ARDUINO < 100)
-#include "WProgram.h"
-#else
-#include "Arduino.h"
-#endif
 #include <arduino.h>
 
 #ifdef BOARD_ARDUINO_MEGA_DUE
@@ -14,32 +9,13 @@
 #endif
 
 #define DEBUG
-
-/**
-* adresse des casiers
-*/
-//casier 1
-#define adrmemtab_veilleuses         1 //0b00000001
-#define adrmemtab_feux_de_crois      2//0b00000010
-#define adrmemtab_phares             3//0b00000100
-#define adrmemtab_clignotant_droit   4//0b00001000
-#define adrmemtab_clignotant_gauche  5//0b00010000
-#define adrmemtab_longues_vues_hautes 6//0b00100000
-#define adrmemtab_antibrouillards     7//0b01000000
-#define adrmemtab_gyrophares          8//0b10000000
-//casier 2
-#define adrmemtab_klaxon              9//0b00000001
-
-
+//creation de la trame de transport
+Payload Trame;
 
 /**
 * mode = bool = true==mode emetteur || false==mode recepteur
 */
 OpenMFU::OpenMFU(bool mode){
-  memtab[0] = 0x3F;
-  memtab[1] = 0b00000000;
-  memtab[2] = 0b00000000;
-  memtab[3] = 0x64; // volant  HEX 64 = 0 centre de -100 à 100 (%)
   xbee_mode_tx=mode;
   Serial2_speed_xbee=57900;// = int = vitesse du port serie xbee
   //Etablir_liason(xbee_mode_tx);
@@ -82,7 +58,7 @@ void OpenMFU::HEX_to_BIN(byte monByte,uint8_t casier_RAM){
 }
 void OpenMFU::Envoie(){
   Serial2.write(0x3F);
-  Serial2.write((uint8_t*)memtab,sizeof(memtab));
+  //Serial2.write((uint8_t*)Trame,sizeof(Trame));
   #ifdef DEBUG
   Serial.write(0x01);
   Serial.print(memtab[0],HEX);
@@ -132,6 +108,7 @@ void OpenMFU::Dernier_contact_RF(){
   }
 }
 void OpenMFU::etat_FAILSAFE(){}
+
 void OpenMFU::Recoie(){
   if (Serial2.available() >= 8 ) { // wait for 6 characters
     for (int i=0; i < 8; i++){
@@ -143,96 +120,62 @@ void OpenMFU::Recoie(){
     Serial.println(" ");
   }
 }
-void OpenMFU::setveil_crois_phares(ModePhare MM){//enum !!!! http://www.locoduino.org/spip.php?article102
-  /* typedef enum { ModeJour = 000b, ModeVeilleuse= 001b, ModeFeuxCroisement = 011b, ModePleinPhare = 111b} ModePhare;
+void OpenMFU::set_veil_crois_phares(ModePhare MP){
+  //enum !!!! http://www.locoduino.org/spip.php?article102
+  /* typedef enum{ModeJour,ModeVeilleuse,ModeFeuxCroisement,ModePleinPhare}ModePhare;
    donc tu peux utiliser les masques, justement pour éviter le switch
    je te conseilles très fortement de faire un #define pour chaque masque*/
-  switch(MM){
+  switch(MP){
     case ModeVeilleuse:// mode veilleuses
-    memtab[1]= memtab[1] | ModeVeilleuse;
-    veilleuses=true;
-    phares=feux_de_croisements=false;
+    Trame.veilleuses=veilleuses=true;
+    Trame.phares=Trame.feux_de_croisements=phares=feux_de_croisements=false;
     break;
     case ModeFeuxCroisement://mode feux de croisement
-    memtab[1]= memtab[1] | ModeFeuxCroisement;
-    veilleuses=feux_de_croisements=true;
-    phares=false;
+    Trame.veilleuses=Trame.feux_de_croisements=veilleuses=feux_de_croisements=true;
+    Trame.phares=phares=false;
     break;
     case ModePleinPhare://mode pleins phares
-    memtab[1]= memtab[1] | ModePleinPhare;
-    veilleuses=feux_de_croisements=phares=true;
+    Trame.veilleuses=veilleuses=Trame.feux_de_croisements=feux_de_croisements=Trame.phares=phares=true;
     break;
     case ModeJour://mode jour (off)
-    memtab[1]= memtab[1] ^ ModeJour;
-    veilleuses=phares=feux_de_croisements=false;
+    Trame.veilleuses=Trame.phares=Trame.feux_de_croisements=veilleuses=phares=feux_de_croisements=false;
     break;
     default:
     break;
   }
 }
-void OpenMFU::setClignotants(ModeClignotants MC){
+void OpenMFU::set_Clignotants(ModeClignotants MC){
   switch(MC){
     case Gauche:
-    memtab[1] = memtab[1] | Gauche; //application du masque
-                                    /* Ancienement
-                                      bitWrite(memtab[1],adrmemtab_clignotant_gauche,true);
-                                      bitWrite(memtab[1],adrmemtab_clignotant_droit,false);
-                                    */
-    clignotant_droit=false;
-    clignotant_gauche=true;
+    Trame.clignotant_droit=clignotant_droit=false;
+    Trame.clignotant_gauche=clignotant_gauche=true;
     break;
     case Droit:
-    memtab[1] = memtab[1] | Droit;
-    clignotant_droit=true;
-    clignotant_gauche=false;
+    Trame.clignotant_droit=clignotant_droit=true;
+    Trame.clignotant_gauche=clignotant_gauche=false;
     break;
     case Warnings:
-    memtab[1] = memtab[1] | Warnings;
-    clignotant_droit=true;
-    clignotant_gauche=true;
+    Trame.clignotant_droit=clignotant_droit=true;
+    Trame.clignotant_gauche=clignotant_gauche=true;
     break;
     default:
     break;
   }
 }
-void OpenMFU::longues_vues(bool LV){
-  longues_vues_hautes=LV;
-  if(LV){
-    bitWrite(memtab[1],adrmemtab_longues_vues_hautes,true);
-    longues_vues_hautes=true;
-  }else{
-    bitWrite(memtab[1],adrmemtab_longues_vues_hautes,false);
-    longues_vues_hautes=false;
-  }
+void OpenMFU::set_longues_vues(bool LV){
+  Trame.longues_vues_hautes=longues_vues_hautes=LV;
 }
-void OpenMFU::setKlaxon(bool K){
-  klaxon_sirene=K;
-  switch (K) {
-    case true:
-    bitWrite(memtab[1],adrmemtab_klaxon,true);
-    break;
-    case false:
-    bitWrite(memtab[1],adrmemtab_klaxon,false);
-    break;
-    //default:
-    //break;
-  }
+void OpenMFU::set_Klaxon(bool K){
+  Trame.klaxon_sirene=klaxon_sirene=K;
 }
-void OpenMFU::setDirection(int vol){
-  volant=constrain(vol,-100,100);
-  memtab[3]=map(vol,-100,100,0,0xC8);
+void OpenMFU::set_Direction(int vol){
+  Trame.volant=volant=constrain(vol,-100,100);
 }
-void OpenMFU::setContact_moteur(bool CM){
-  moteur = CM;
-  if(moteur){
-    bitWrite(memtab[2],4,1);
-  }else{
-    bitWrite(memtab[2],4,0);
-  }
+void OpenMFU::set_Contact_moteur(bool CM){
+  Trame.moteur=moteur = CM;
 }
-void OpenMFU::setTraction(int acc){
-  traction=constrain(acc,-100,100);
-  memtab[0]=map(traction,-100,100,0,0xC8);
+void OpenMFU::set_Traction(int acc){
+  Trame.traction=traction=constrain(acc,-100,100);
 }
 void OpenMFU::printBits(byte myByte){
   for(byte mask = 0x80; mask; mask >>= 1){

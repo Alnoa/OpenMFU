@@ -5,18 +5,40 @@
 #include <inttypes.h>
 #include <arduino.h>
 #include <HardwareSerial.h>
-typedef enum{
-	ModeJour = 0b00000000,
-	ModeVeilleuse= 0b00000001,
-	ModeFeuxCroisement = 0b00000011,
-	ModePleinPhare = 0b00000111
-} ModePhare;
+typedef enum{	ModeJour,
+							ModeVeilleuse,
+							ModeFeuxCroisement,
+							ModePleinPhare
+						} ModePhare;
 
-typedef enum{
-	Gauche =   0b00010000,
-	Droit =  	 0b00001000,
-	Warnings = 0b00011000
-} ModeClignotants;
+typedef enum{ Gauche,
+							Droit,
+							Warnings
+						} ModeClignotants;
+
+/**
+ * Message
+ */
+typedef struct {
+	//byte ENTETE = 0xFA;
+	//1er groupe de bool dans un octet
+	bool veilleuses:1;
+	bool feux_de_croisements:1;
+	bool phares:1;
+	bool clignotant_droit:1;
+	bool clignotant_gauche:1;
+	bool longues_vues_hautes:1;
+	bool antibrouillards:1;
+	bool klaxon_sirene:1;
+	//2eme groupe
+	bool moteur:2;
+	bool marche_avant_moteur:2;
+
+	int8_t volant;
+	int8_t traction;
+	int8_t rapport_boite_de_vitesse;
+	unsigned char CRC;
+} Payload;
 
 class OpenMFU{
 public:
@@ -28,34 +50,34 @@ public:
 	void etat_FAILSAFE();
 	void Envoie();
 	void Recoie();
-	void setveil_crois_phares(ModePhare MP);
-	void longues_vues(bool LV);
-	void setKlaxon(bool K);
-	void setContact_moteur(bool CM);
-	void setTraction(int acc);
-	void setDirection(int vol);
-	void setClignotants(ModeClignotants MC);
+	void set_veil_crois_phares(ModePhare MP);
+	void set_longues_vues(bool LV);
+	void set_Klaxon(bool K);
+	void set_Contact_moteur(bool CM);
+	void set_Traction(int acc);
+	void set_Direction(int vol);
+	void set_Clignotants(ModeClignotants MC);
 
 	//accesseurs
 	//Péripheriques
 	bool remorque(){return remorque_etat;}
 	uint8_t batterie(){return niveau_batterie;}
 	//eclairages
-	bool getVeilleuse(){return veilleuses;}
-	bool getPhares(){return phares;}
-	bool getFeux_de_croisements(){return feux_de_croisements;}
-	bool getGyrophares(){return gyrophares;}
-	bool getLongues_vues_hautes(){return longues_vues_hautes;}
-	bool getAntibrouillards(){return antibrouillards;}
-	bool getKlaxon(){return klaxon_sirene;}
-	bool getClignotant_droit(){return clignotant_droit;}
-	bool getClignotant_gauche(){return clignotant_gauche;}
+	bool get_Veilleuse(){return veilleuses;}
+	bool get_Phares(){return phares;}
+	bool get_Feux_de_croisements(){return feux_de_croisements;}
+	bool get_Gyrophares(){return gyrophares;}
+	bool get_Longues_vues_hautes(){return longues_vues_hautes;}
+	bool get_Antibrouillards(){return antibrouillards;}
+	bool get_Klaxon(){return klaxon_sirene;}
+	bool get_Clignotant_droit(){return clignotant_droit;}
+	bool get_Clignotant_gauche(){return clignotant_gauche;}
 	//Motorisation
-	int8_t getTraction(){return traction;}
-	int8_t getDirection(){return volant;}
-	bool getContact_moteur(){return moteur;}
-	bool getMarche_avant_moteur(){return marche_avant_moteur;}
-	uint8_t getRapport_de_BV(){return rapport_boite_de_vitesse;}
+	int8_t get_Traction(){return traction;}
+	int8_t get_Direction(){return volant;}
+	bool get_Contact_moteur(){return moteur;}
+	bool get_Marche_avant_moteur(){return marche_avant_moteur;}
+	uint8_t get_Rapport_de_BV(){return rapport_boite_de_vitesse;}
 
 	void printBits(byte myByte);
 
@@ -102,5 +124,6 @@ private:
 	*/
 	byte commandes[10];
 	void HEX_to_BIN(byte monByte,uint8_t casier_RAM);
+
 };
 #endif
